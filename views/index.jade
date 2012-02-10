@@ -24,40 +24,40 @@ html
 				});
 				socket.on('msg',function(messages){
 					messages.forEach(function(data){
-					var espcape = data.text.replace(/\\r\?\\n/g, "<br/>") ;
-					var commenthtml  = '<div>';
-						commenthtml += '	<span style="font-size:2em;color:green;">' + data.user + '</span>';
-						commenthtml += '	<span>' + data.date.toLocaleString() + '</span>';
-						commenthtml += '</div>';
-						commenthtml += '<p style="font-size:2em">' + espcape + '</p>';
+						var espcape = data.text.replace(/\\r\?\\n/g, "<br/>") ;
+						var commenthtml  = '<div>';
+							commenthtml += '	<span style="font-size:1.5em;color:green;">' + data.user + '</span>';
+							commenthtml += '	<span>' + data.date.toLocaleString() + '</span>';
+							commenthtml += '</div>';
+							commenthtml += '<p style="font-size:1.5em">' + espcape + '</p>';
 
-					var commentelm = $('<div>').addClass('msgDiv');
-					
-					commentelm.html(commenthtml);
-					var msg = $('#msg');
-					msg.prepend(commentelm);
-					if(messages.length > 1){
-						commentelm.slideToggle();
-					} else {
-					if($('#mode').is(':checked')){
-						try{
-							var notice = Notification.create('','from:'+data.user,data.text);
-							notice.ondisplay = function(){
-								setTimeout(function(){
-									notice.cancel();
-								},5000);
-							};
-							notice.onclose = function(){
-								commentelm.slideToggle();
-							};
-							notice.show();
-						}catch(e){
+						var commentelm = $('<div>').addClass('msgDiv');
+						
+						commentelm.html(commenthtml);
+						var msg = $('#msg');
+						msg.prepend(commentelm);
+						if(messages.length > 1){
 							commentelm.slideToggle();
+						} else {
+							if($('#mode').is(':checked')){
+								try{
+									var notice = Notification.create('','from-'+data.user,data.text);
+									notice.ondisplay = function(){
+										setTimeout(function(){
+											notice.cancel();
+										},5000);
+									};
+									notice.onclose = function(){
+										commentelm.slideToggle();
+									};
+									notice.show();
+								}catch(e){
+									commentelm.slideToggle();
+								}
+							} else {
+								commentelm.slideToggle();
+							}
 						}
-					} else {
-						commentelm.slideToggle();
-					}
-					}
 					});
 				});
 				socket.on('counter',function(count){
@@ -82,6 +82,7 @@ html
 						}
 						socket.emit('send',{user:user.val(),text:text.val()});
 						text.val('');
+						text.focus()
 					} else {
 						self.noop = true;
 						user.effect('highlight','fast',function(){
