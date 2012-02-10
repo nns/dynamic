@@ -1,0 +1,52 @@
+!!!
+html
+	head
+		link(rel='stylesheet', href='/stylesheets/style.css')
+		script(src='/javascripts/jquery.min.js')
+		script(src='/javascripts/jquery-ui.min.js')
+		script(src='/javascripts/notifications.js')
+		script('text/javascript',src='/socket.io/socket.io.js')
+		script
+			$(function(){
+				var socket = io.connect('#{id}');
+				
+				socket.on('msg',function(data){
+					var commenthtml  = '<div>';
+						commenthtml += '	<span style="color:green;">' + data.user + '</span>';
+						commenthtml += '	<span>' + data.date + '</span>';
+						commenthtml += '</div>';
+						commenthtml += '<p>' + data.text + '</p>';
+					var commentelm = $('<div class="msgDiv" style="display:none"/>');
+					commentelm.html(commenthtml);
+					var msg = $('#msg');
+					msg.prepend(commentelm);
+					commentelm.slideToggle();
+				});
+				socket.on('add',function(count){
+					document.getElementById('counter').innerHTML = count;
+				});
+				socket.on('remove',function(count){
+					document.getElementById('counter').innerHTML = count;
+				});
+				
+				window.onload = function(){
+					$('#button').click(function(e){
+						var user = $('#user');
+						var text = $('#text');
+						if(user.val()){
+							socket.emit('send',{user:user.val(),text:text.val()});
+							text.val('');
+						} else {
+							user.effect('bounce');
+						}
+					});
+				}	
+			});
+	body
+		p#counter
+		#content
+			input#user(type="text")
+			br
+			textarea#text
+			input#button.button(type="button",value="send")
+			#msg.msg
