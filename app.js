@@ -12,7 +12,7 @@ app.configure(function(){
   app.use(express.static(__dirname + '/public'));
 });
 
-app.listen(3000);
+app.listen(process.argv[2] | 80);
 var io = sio.listen(app);
 
 var rooms = {};
