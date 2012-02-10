@@ -27,7 +27,9 @@ body {
 }
 #content .msgDiv{
 	width:100%;
+	display:none;
     border-bottom:#fff solid 1px;
+    
 }
 #content p{
 	margin:1px;

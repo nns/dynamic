@@ -33,7 +33,7 @@ app.get('/:id',function(req,res){
 		room.sockets.on('connection',function(socket){
 			console.log('connection');
 			room.counter++;
-			room.sockets.volatile.emit('add',room.counter);
+			room.sockets.volatile.emit('counter',room.counter);
 			
 			socket.on('send',function(data){
 				if(data.user && data.text){
@@ -50,7 +50,7 @@ app.get('/:id',function(req,res){
 					room.sockets.removeAllListeners();
 					delete rooms[room.id];
 				} else {
-					room.sockets.volatile.emit('remove',room.counter);
+					room.sockets.volatile.emit('counter',room.counter);
 				}
 			});
 		});
