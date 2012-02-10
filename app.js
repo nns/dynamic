@@ -3,6 +3,15 @@ var express = require('express')
 
 var app = express.createServer();
 
+
+app.configure('development', function(){
+	app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+});
+
+app.configure('production', function(){
+	app.use(express.errorHandler()); 
+});
+
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
@@ -14,6 +23,23 @@ app.configure(function(){
 
 app.listen(process.argv[2] || 80);
 var io = sio.listen(app);
+
+io.configure('production', function(){
+	io.enable('browser client etag');
+	io.enable('browser client gzip');
+	io.enable('browser client minification');
+	io.set('log level', 1);
+
+	io.set('transports', [
+	'websocket'
+	, 'htmlfile'
+	, 'xhr-polling'
+	, 'jsonp-polling'
+	]);
+});
+io.configure('development', function(){
+	io.set('transports', ['websocket']);
+});
 
 var rooms = {};
 app.get('/:id',function(req,res){
@@ -31,7 +57,6 @@ app.get('/:id',function(req,res){
 		room.sockets = io.of(id);
 		room.counter = 0;
 		room.sockets.on('connection',function(socket){
-			console.log('connection');
 			room.counter++;
 			room.sockets.volatile.emit('counter',room.counter);
 			
