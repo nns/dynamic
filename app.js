@@ -56,14 +56,20 @@ app.get('/:id',function(req,res){
 		room.id = id;
 		room.sockets = io.of(id);
 		room.counter = 0;
+		room.messages = [];
 		room.sockets.on('connection',function(socket){
 			room.counter++;
 			room.sockets.volatile.emit('counter',room.counter);
+			socket.volatile.emit('msg',room.messages);
 			
 			socket.on('send',function(data){
 				if(data.user && data.text){
 					data.date = new Date();
-					room.sockets.emit('msg',data);
+					room.messages.push(data);
+					if(room.messages.length > 100){
+						room.messages.shift();
+					}
+					room.sockets.emit('msg',[data]);
 				}
 			});
 			

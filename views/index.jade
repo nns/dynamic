@@ -19,7 +19,11 @@ html
 				$('#mode').attr('checked',localStorage.isChecked == 'true' ? true : false);
 				
 				var socket = io.connect('#{id}');
-				socket.on('msg',function(data){
+				socket.on('connect',function(){
+					$('#msg').html('');	
+				});
+				socket.on('msg',function(messages){
+					messages.forEach(function(data){
 					var espcape = data.text.replace(/\\r\?\\n/g, "<br/>") ;
 					var commenthtml  = '<div>';
 						commenthtml += '	<span style="font-size:2em;color:green;">' + data.user + '</span>';
@@ -32,6 +36,9 @@ html
 					commentelm.html(commenthtml);
 					var msg = $('#msg');
 					msg.prepend(commentelm);
+					if(messages.length > 1){
+						commentelm.slideToggle();
+					} else {
 					if($('#mode').is(':checked')){
 						try{
 							var notice = Notification.create('','from:'+data.user,data.text);
@@ -50,6 +57,8 @@ html
 					} else {
 						commentelm.slideToggle();
 					}
+					}
+					});
 				});
 				socket.on('counter',function(count){
 					$('#counter').text(count);
