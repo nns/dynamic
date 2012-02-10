@@ -6,28 +6,50 @@ html
 		script(src='/javascripts/jquery.min.js')
 		script(src='/javascripts/jquery-ui.min.js')
 		script(src='/javascripts/notifications.js')
+		script(src='/javascripts/notifications.js')
 		script('text/javascript',src='/socket.io/socket.io.js')
 		script
 			$(function(){
-				if(localStorage){
-					if(localStorage.user){
-						$('#user').val(localStorage.user);
-					}
+				if(!localStorage){
+					localStorage = {};
 				}
+				if(localStorage.user){
+					$('#user').val(localStorage.user);
+				}
+				$('#mode').attr('checked',localStorage.isChecked == 'true' ? true : false);
+				
 				var socket = io.connect('#{id}');
 				socket.on('msg',function(data){
+					var espcape = data.text.replace(/\\r\?\\n/g, "<br/>") ;
 					var commenthtml  = '<div>';
 						commenthtml += '	<span style="font-size:2em;color:green;">' + data.user + '</span>';
 						commenthtml += '	<span>' + data.date.toLocaleString() + '</span>';
 						commenthtml += '</div>';
-						commenthtml += '<p style="font-size:2em">' + data.text + '</p>';
-						
+						commenthtml += '<p style="font-size:2em">' + espcape + '</p>';
+
 					var commentelm = $('<div>').addClass('msgDiv');
 					
 					commentelm.html(commenthtml);
 					var msg = $('#msg');
 					msg.prepend(commentelm);
-					commentelm.slideToggle();
+					if($('#mode').is(':checked')){
+						try{
+							var notice = Notification.create('','from:'+data.user,data.text);
+							notice.ondisplay = function(){
+								setTimeout(function(){
+									notice.cancel();
+								},5000);
+							};
+							notice.onclose = function(){
+								commentelm.slideToggle();
+							};
+							notice.show();
+						}catch(e){
+							commentelm.slideToggle();
+						}
+					} else {
+						commentelm.slideToggle();
+					}
 				});
 				socket.on('counter',function(count){
 					$('#counter').text(count);
@@ -38,14 +60,16 @@ html
 					if(self.noop){
 						return false;
 					}
+					if($('#mode').is(':checked')){
+						try{
+							Notification.ask();
+						}catch(e){}
+					}
 					var user = $('#user');
 					var text = $('#text');
 					if(user.val()){
-						if(localStorage){
-							if(localStorage.user !== user.val()){
-								localStorage.user = user.val();
-							}
-							
+						if(localStorage.user !== user.val()){
+							localStorage.user = user.val();
 						}
 						socket.emit('send',{user:user.val(),text:text.val()});
 						text.val('');
@@ -56,12 +80,17 @@ html
 						});
 					}
 				});
+				$('#mode').change(function() {
+					localStorage.isChecked = $(this).is(':checked');
+				});
 			});
 	body
 		p#counter
 		#content
 			#puts(style='width:100%')
 				input#user(type="text")
+				input#mode(type="checkbox")
+				label(for="mode") show dialog?
 			textarea#text
 			input#button.button(type="button",value="send")
 			#msg.msg

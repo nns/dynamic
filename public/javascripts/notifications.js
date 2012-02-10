@@ -28,7 +28,7 @@ Notification = {
  },
 
  //作成したNotificationオブジェクトを返す。
- create : function (title, message, icon) {
+ create : function (icon, title, message) {
   if (!this.initialized) {
    if (!this.init()) {
     //ブラウザがNotifications APIに対応していない
@@ -40,6 +40,20 @@ Notification = {
    throw Notification.NOT_ALLOWED;
   } else {
    return webkitNotifications.createNotification(icon, title, message);
+  }
+ },
+ createHTML : function(html){
+  if (!this.initialized) {
+   if (!this.init()) {
+    //ブラウザがNotifications APIに対応していない
+    throw Notification.NOT_SUPPORTED;
+   }
+  }
+  if (webkitNotifications.permissionLevel !== webkitNotifications.PERMISSION_ALLOWED) {
+   //許可されていない
+   throw Notification.NOT_ALLOWED;
+  } else {
+   return webkitNotifications.createHTMLNotification(html);
   }
  },
 

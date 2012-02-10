@@ -12,7 +12,7 @@ app.configure(function(){
   app.use(express.static(__dirname + '/public'));
 });
 
-app.listen(process.argv[2] | 80);
+app.listen(process.argv[2] || 80);
 var io = sio.listen(app);
 
 var rooms = {};
@@ -37,7 +37,6 @@ app.get('/:id',function(req,res){
 			
 			socket.on('send',function(data){
 				if(data.user && data.text){
-					data.text = data.text.replace(/\r?\n/g, "<br/>");
 					data.date = new Date();
 					room.sockets.emit('msg',data);
 				}
