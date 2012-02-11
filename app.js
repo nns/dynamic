@@ -77,9 +77,10 @@ app.get('/:id',function(req,res){
 			socket.on('disconnect',function(){
 				room.counter--;
 				if(room.counter <= 0){
-					console.log('delete room %s',room.id);
-					room.sockets.removeAllListeners();
-					delete rooms[room.id];
+					console.log('counter zero: %s',room.id);
+					//console.log('delete room %s',room.id);
+					//room.sockets.removeAllListeners();
+					//delete rooms[room.id];
 				} else {
 					room.sockets.volatile.emit('counter',room.counter);
 				}
