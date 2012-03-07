@@ -30,7 +30,6 @@ io.configure('production', function(){
 	io.enable('browser client minification');
 	io.set('log level', 1);
 
-
 	io.set('transports', [
 	'websocket'
 	, 'htmlfile'
@@ -39,7 +38,17 @@ io.configure('production', function(){
 	]);
 });
 io.configure('development', function(){
-	io.set('transports', ['websocket']);
+	io.enable('browser client etag');
+	io.enable('browser client gzip');
+	io.enable('browser client minification');
+	io.set('log level', 1);
+
+	io.set('transports', [
+	'websocket'
+	, 'htmlfile'
+	, 'xhr-polling'
+	, 'jsonp-polling'
+	]);
 });
 
 var rooms = {};

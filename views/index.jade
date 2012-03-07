@@ -6,7 +6,6 @@ html
 		script(src='/javascripts/jquery.min.js')
 		script(src='/javascripts/jquery-ui.min.js')
 		script(src='/javascripts/notifications.js')
-		script(src='/javascripts/notifications.js')
 		script('text/javascript',src='/socket.io/socket.io.js')
 		script
 			$(function(){
@@ -24,16 +23,11 @@ html
 				});
 				socket.on('msg',function(messages){
 					messages.forEach(function(data){
-						var espcape = data.text.replace(/\\r\?\\n/g, "<br/>") ;
-						var commenthtml  = '<div>';
-							commenthtml += '	<span style="font-size:1.5em;color:green;">' + data.user + '</span>';
-							commenthtml += '	<span>' + data.date.toLocaleString() + '</span>';
-							commenthtml += '</div>';
-							commenthtml += '<p style="font-size:1.5em">' + espcape + '</p>';
-
-						var commentelm = $('<div>').addClass('msgDiv');
-						
-						commentelm.html(commenthtml);
+						var p = $('<p>').text(data.text).css({fontSize:'1.5em'});
+						var usr = $('<span>').text(data.user).css({fontSize:'1.5em',color:'green'});
+						var dd = $('<span>').text(new Date(data.date).toLocaleString());
+						var box = $('<div>').append(usr).append(dd);
+						var commentelm = $('<div>').addClass('msgDiv').append(box).append(p);
 						var msg = $('#msg');
 						msg.prepend(commentelm);
 						if(messages.length > 1){

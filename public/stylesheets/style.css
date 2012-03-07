@@ -1,12 +1,13 @@
 /* Design */
 body {
-	background-image:url(../images/bg.gif);
-	height:100%
-	background-repeat:repeat-x;
+	background-image:url(../images/bg2.gif);
+	background-color:black;
+	background-repeat:repeat-y;
 	font-family: Tahoma, Arial, Helvetica, sans-serif;
 	font-size: .70em;
 	color: #FFFFFF;
 	margin-top: 5%;
+	margin-left :5%;
 	scrollbar-track-color: #121212;
 	scrollbar-face-color: #121212;
 	scrollbar-shadow-color: #121212;
@@ -24,7 +25,7 @@ body {
 }
 
 #content .msg{
-	width:50%;
+	width:80%;
 }
 #content .msgDiv{
 	width:100%;
