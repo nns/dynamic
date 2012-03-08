@@ -69,8 +69,8 @@ app.get('/:id',function(req,res){
 		room.messages = [];
 		room.sockets.on('connection',function(socket){
 			room.counter++;
-			room.sockets.volatile.emit('counter',room.counter);
-			socket.volatile.emit('msg',room.messages);
+			room.sockets.emit('counter',room.counter);
+			socket.emit('msg',room.messages);
 			
 			socket.on('send',function(data){
 				if(data.user && data.text){
