@@ -1,6 +1,7 @@
 !!! 5
 html
 	head
+		title(id="t") 
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 		link(rel='stylesheet', href='/stylesheets/style.css')
 		script(src='/javascripts/jquery.min.js')
@@ -56,6 +57,7 @@ html
 				});
 				socket.on('counter',function(count){
 					$('#counter').text(count);
+					$('#t').text(location.href + '(' + count + ')');
 				});
 				
 				$('#button').click(function(e){
