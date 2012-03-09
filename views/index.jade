@@ -57,7 +57,7 @@ html
 				});
 				socket.on('counter',function(count){
 					$('#counter').text(count);
-					$('#t').text(location.href + '(' + count + ')');
+					$('#t').text(decodeURI(location.href) + '(' + count + ')');
 				});
 				
 				$('#button').click(function(e){
