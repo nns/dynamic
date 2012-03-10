@@ -24,6 +24,7 @@ html
 				});
 				socket.on('msg',function(messages){
 					messages.forEach(function(data){
+						data = JSON.parse(data);
 						var p = $('<pre>').text(data.text).css({fontSize:'1.5em',margin:'1px'});
 						var usr = $('<span>').text(data.user).css({fontSize:'1.5em',color:'green'});
 						var dd = $('<span>').text(new Date(data.date).toLocaleString());

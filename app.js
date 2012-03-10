@@ -1,5 +1,7 @@
 var express = require('express')
-	,sio = require('socket.io');
+	,sio = require('socket.io')
+	,redis = require('redis')
+	,client = redis.createClient()
 
 var app = express.createServer();
 
@@ -32,19 +34,26 @@ io.configure('production', function(){
 
 	io.set('transports', [
 	'websocket'
-	, 'htmlfile'
 	, 'xhr-polling'
 	, 'jsonp-polling'
 	]);
 });
 io.configure('development', function(){
 	io.set('log level', 3);
-
 	io.set('transports', [
 	'websocket'
 	]);
 });
 
+//data delete
+app.get('/:id/del',function(req, res){
+	var id = '/' + req.params.id;
+	client.del(id);
+	res.redirect(id);
+});
+
+
+//room
 var rooms = {};
 app.get('/:id',function(req,res){
 	var id = '/'+ req.params.id;
@@ -60,20 +69,21 @@ app.get('/:id',function(req,res){
 		room.id = id;
 		room.sockets = io.of(id);
 		room.counter = 0;
-		room.messages = [];
+
 		room.sockets.on('connection',function(socket){
 			room.counter++;
 			room.sockets.emit('counter',room.counter);
-			socket.emit('msg',room.messages);
-			
+				
+			client.zrange(room.id, -50,-1, function(err, list){
+				console.log(list);
+				socket.emit('msg',list);
+			});
+
 			socket.on('send',function(data){
 				if(data.user && data.text){
 					data.date = new Date();
-					room.messages.push(data);
-					if(room.messages.length > 100){
-						room.messages.shift();
-					}
-					room.sockets.emit('msg',[data]);
+					client.zadd(room.id, data.date.getTime() ,JSON.stringify(data));
+					room.sockets.emit('msg',[JSON.stringify(data)]);
 				}
 			});
 			
@@ -81,11 +91,9 @@ app.get('/:id',function(req,res){
 				room.counter--;
 				if(room.counter <= 0){
 					console.log('counter zero: %s',room.id);
-					//console.log('delete room %s',room.id);
-					//room.sockets.removeAllListeners();
-					//delete rooms[room.id];
+					delete rooms[room.id];
 				} else {
-					room.sockets.volatile.emit('counter',room.counter);
+					room.sockets.emit('counter',room.counter);
 				}
 			});
 		});
