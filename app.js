@@ -75,7 +75,6 @@ app.get('/:id',function(req,res){
 			room.sockets.emit('counter',room.counter);
 				
 			client.zrange(room.id, -50,-1, function(err, list){
-				console.log(list);
 				socket.emit('msg',list);
 			});
 
