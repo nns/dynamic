@@ -90,6 +90,7 @@ app.get('/:id',function(req,res){
 				room.counter--;
 				if(room.counter <= 0){
 					console.log('counter zero: %s',room.id);
+					room.sockets.removeAllListeners();
 					delete rooms[room.id];
 				} else {
 					room.sockets.emit('counter',room.counter);
