@@ -69,7 +69,7 @@ io.configure(function () {
 //data delete
 app.get('/:id/del',function(req, res){
 	var id = '/' + req.params.id;
-//	client.del(id);
+	client.del(id);
 	res.redirect(id);
 });
 
