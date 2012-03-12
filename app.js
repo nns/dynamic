@@ -2,6 +2,8 @@ var express = require('express')
 	,sio = require('socket.io')
 	,redis = require('redis')
 	,client = redis.createClient()
+ 	,parseCookie = require('connect').utils.parseCookie
+	,crypto = require('crypto')
 
 var app = express.createServer();
 
@@ -45,10 +47,29 @@ io.configure('development', function(){
 	]);
 });
 
+var ids = {};
+io.configure(function () {
+	io.set('authorization', function (handshakeData, callback) {
+		 if(handshakeData.headers.cookie) {
+			 var cookie = handshakeData.headers.cookie;
+			 var sessionID = parseCookie(cookie)['connect.sid'];
+			 var id = ids[sessionID];
+			 if(id){
+				 handshakeData.sessionID = id;
+			 } else {
+			 		ids[sessionID] = crypto.randomBytes(12).toString('base64');
+			 }
+			 
+		 }
+		 callback(null, true);
+	});
+});
+
+
 //data delete
 app.get('/:id/del',function(req, res){
 	var id = '/' + req.params.id;
-	client.del(id);
+//	client.del(id);
 	res.redirect(id);
 });
 
@@ -81,6 +102,7 @@ app.get('/:id',function(req,res){
 			socket.on('send',function(data){
 				if(data.user && data.text){
 					data.date = new Date();
+					data.sessionID = socket.handshake.sessionID;
 					client.zadd(room.id, data.date.getTime() ,JSON.stringify(data));
 					room.sockets.emit('msg',[JSON.stringify(data)]);
 				}
@@ -88,6 +110,7 @@ app.get('/:id',function(req,res){
 			
 			socket.on('disconnect',function(){
 				room.counter--;
+				delete ids[socket.handshake.sessionID];
 				if(room.counter <= 0){
 					console.log('counter zero: %s',room.id);
 					room.sockets.removeAllListeners();
