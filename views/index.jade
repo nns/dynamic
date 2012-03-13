@@ -61,6 +61,10 @@ html
 					$('#t').text(decodeURI(location.href) + '(' + count + ')');
 				});
 				
+				socket.on('disconnect', function(data){
+					$('#counter').text('connection closed, please reload this page');
+					$('#button').fadeOut();
+				});
 				$('#button').click(function(e){
 					var self = this;
 					if(self.noop){

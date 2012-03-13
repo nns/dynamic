@@ -1,7 +1,7 @@
 var express = require('express')
 	,sio = require('socket.io')
-	,redis = require('redis')
-	,client = redis.createClient()
+//	,redis = require('redis')
+//	,client = redis.createClient()
  	,parseCookie = require('connect').utils.parseCookie
 	,crypto = require('crypto')
 
@@ -72,7 +72,7 @@ io.configure(function () {
 //data delete
 app.get('/:id/del',function(req, res){
 	var id = '/' + req.params.id;
-	client.del(id);
+//	client.del(id);
 	res.redirect(id);
 });
 
@@ -98,15 +98,15 @@ app.get('/:id',function(req,res){
 			room.counter++;
 			room.sockets.emit('counter',room.counter);
 				
-			client.zrange(room.id, -50,-1, function(err, list){
-				socket.emit('msg',list);
-			});
+//			client.zrange(room.id, -50,-1, function(err, list){
+//				socket.emit('msg',list);
+//			});
 
 			socket.on('send',function(data){
 				if(data.user && data.text){
 					data.date = new Date();
 					data.sessionID = socket.handshake.sessionID;
-					client.zadd(room.id, data.date.getTime() ,JSON.stringify(data));
+//					client.zadd(room.id, data.date.getTime() ,JSON.stringify(data));
 					room.sockets.emit('msg',[JSON.stringify(data)]);
 				}
 			});
