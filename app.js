@@ -21,6 +21,8 @@ app.configure(function(){
   app.set('view engine', 'jade');
   app.use(express.bodyParser());
   app.use(express.methodOverride());
+	app.use(express.cookieParser());
+	app.use(express.session({ secret: 'secrets' }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 });
@@ -54,10 +56,11 @@ io.configure(function () {
 			 var cookie = handshakeData.headers.cookie;
 			 var sessionID = parseCookie(cookie)['connect.sid'];
 			 var id = ids[sessionID];
+			 console.log(id);
 			 if(id){
 				 handshakeData.sessionID = id;
 			 } else {
-			 		ids[sessionID] = crypto.randomBytes(12).toString('base64');
+			 		handshakeData.sessionID = ids[sessionID] = crypto.randomBytes(12).toString('base64');
 			 }
 			 
 		 }
