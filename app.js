@@ -2,7 +2,7 @@ var express = require('express')
   ,sio = require('socket.io')
   ,redis = require('redis')
   ,client = redis.createClient()
-   ,parseCookie = require('connect').utils.parseCookie
+  ,parseCookie = require('connect').utils.parseCookie
   ,crypto = require('crypto')
 
 var app = express.createServer();
