@@ -50,6 +50,11 @@ io.configure('development', function(){
   ]);
 });
 
+io.configure(function(){
+  io.set("transports", ["xhr-polling"]); 
+  io.set("polling duration", 10); 
+});
+
 var ids = {};
 io.configure(function () {
   io.set('authorization', function (handshakeData, callback) {
