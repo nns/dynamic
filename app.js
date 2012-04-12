@@ -37,10 +37,13 @@ io.configure('production', function(){
   io.enable('browser client gzip');
   io.enable('browser client minification');
   io.set('log level', 1);
+  io.set('close timeout',10);
+  io.set('polling duaration',10);
 });
 io.configure(function(){
   io.set('transports', [
-  'websocket'
+    'websocket',
+    'xhr-polling'
   ]);
 });
 

@@ -1,7 +1,8 @@
 var proxy = require('http-proxy');
 var options = {
   router: {
-   '175.41.194.67/dchat': 'localhost:3000'
+    '175.41.194.67/dchat': 'localhost:3000',
+    'localhost/dchat' : 'localhost:3000'
   }
 };
 var server = proxy.createServer(options);
