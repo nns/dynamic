@@ -3,8 +3,10 @@ var express = require('express')
   ,redis = require('redis')
   ,client = redis.createClient()
   ,parseCookie = require('connect').utils.parseCookie
-  ,crypto = require('crypto')
+  ,crypto = require('crypto');
 
+var contextRoot = '/dchat';
+var scontextRoot = 'dchat';
 var app = express.createServer();
 
 
@@ -35,19 +37,13 @@ io.configure('production', function(){
   io.enable('browser client gzip');
   io.enable('browser client minification');
   io.set('log level', 1);
+});
+io.configure(function(){
+  io.set('transports', [
+  'websocket'
+  ]);
+});
 
-  io.set('transports', [
-  'websocket'
-  , 'xhr-polling'
-  , 'jsonp-polling'
-  ]);
-});
-io.configure('development', function(){
-  io.set('log level', 3);
-  io.set('transports', [
-  'websocket'
-  ]);
-});
 
 var ids = {};
 io.configure(function () {
@@ -73,7 +69,7 @@ io.configure(function () {
 app.get('/:id/del',function(req, res){
   var id = '/' + req.params.id;
   client.del(id);
-  res.redirect(id);
+  res.redirect(contextRoot + id);
 });
 
 
@@ -92,6 +88,7 @@ app.get('/:id',function(req,res){
     var room = rooms[id] = {};
     room.id = id;
     room.sockets = io.of(id);
+    console.log(id);
     room.counter = 0;
 
     room.sockets.on('connection',function(socket){
@@ -123,8 +120,13 @@ app.get('/:id',function(req,res){
         }
       });
     });
-    res.redirect(id);
+    res.redirect(contextRoot + id);
   } else {
-    res.render('index', { id: id ,layout:false});
+    res.render('index', { 
+      id:id,
+      layout:false,
+      contextRoot:contextRoot,
+      scontextRoot:scontextRoot 
+    });
   }
 });
