@@ -15,7 +15,7 @@ var express = require('express')
 var app = express();
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 3000);
+  app.set('port', process.argv[2] || 3000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.favicon());
@@ -89,11 +89,9 @@ io.sockets.on('connection', function(socket){
   });
 
   socket.on('send',function(data){
-    console.log(data);
     if(data.user && data.text){
       data.date = new Date();
       data.sessionID = userData.sessinID;
-      console.log(userData.room);
       client.zadd(userData.room, data.date.getTime() ,JSON.stringify(data));
       socket.to(userData.room).emit('message',[JSON.stringify(data)]);
       //socket.to(userData.room).emit('message',[JSON.stringify(data)]);
