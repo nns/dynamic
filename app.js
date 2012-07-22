@@ -10,6 +10,7 @@ var express = require('express')
   , redis = require('redis')
   , client = redis.createClient()
   , crypto = require('crypto')
+  , connect = require('connect')
 ;
 
 var app = express();
@@ -74,8 +75,9 @@ io.sockets.on('connection', function(socket){
 
   console.log('connect');
   socket.on('enter room', function(url){
-    
+    url = decodeURI(url);
     var room = url.split('/').pop();
+    console.log(room);
     room = room || '/';
     userData.room = room
     socket.join(room);
@@ -93,7 +95,7 @@ io.sockets.on('connection', function(socket){
       data.date = new Date();
       data.sessionID = userData.sessinID;
       client.zadd(userData.room, data.date.getTime() ,JSON.stringify(data));
-      socket.to(userData.room).emit('message',[JSON.stringify(data)]);
+      io.sockets.to(userData.room).emit('message',[JSON.stringify(data)]);
       //socket.to(userData.room).emit('message',[JSON.stringify(data)]);
     }
   });
