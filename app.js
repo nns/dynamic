@@ -1,36 +1,48 @@
+
+/**
+ * Module dependencies.
+ */
+
 var express = require('express')
-  ,sio = require('socket.io')
-  ,redis = require('redis')
-  ,client = redis.createClient()
-  ,parseCookie = require('connect').utils.parseCookie
-  ,crypto = require('crypto');
+  , routes = require('./routes')
+  , http = require('http')
+  , sio = require('socket.io')
+  , redis = require('redis')
+  , client = redis.createClient()
+  , crypto = require('crypto')
+;
 
-var contextRoot = '/dchat';
-var scontextRoot = 'dchat';
-var app = express.createServer();
+var app = express();
 
+app.configure(function(){
+  app.set('port', process.env.PORT || 3000);
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'jade');
+  app.use(express.favicon());
+  app.use(express.logger('dev'));
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(app.router);
+  app.use(express.static(__dirname + '/public'));
+});
 
 app.configure('development', function(){
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  app.use(express.errorHandler());
 });
 
 app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
 
-app.configure(function(){
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
-  app.use(express.bodyParser());
-  app.use(express.methodOverride());
-  app.use(express.cookieParser());
-  app.use(express.session({ secret: 'secrets' ,cookie:{maxAge: 94670777 * 1000}}));
-  app.use(app.router);
-  app.use(express.static(__dirname + '/public'));
+app.get('/:room?', routes.index);
+
+var server = http.createServer(app).listen(app.get('port'), function(){
+  console.log("Express server listening on port " + app.get('port'));
 });
 
-app.listen(process.argv[2] || 80);
-var io = sio.listen(app);
+
+var io = sio.listen(server);
+
 
 io.configure('production', function(){
   io.enable('browser client etag');
@@ -48,88 +60,40 @@ io.configure(function(){
 });
 
 
-var ids = {};
-io.configure(function () {
-  io.set('authorization', function (handshakeData, callback) {
-     if(handshakeData.headers.cookie) {
-       var cookie = handshakeData.headers.cookie;
-       var sessionID = parseCookie(cookie)['connect.sid'];
-       var id = ids[sessionID];
-       handshakeData.expressSessionID = sessionID;
-       if(id){
-         handshakeData.sessionID = id;
-       } else {
-         handshakeData.sessionID = ids[sessionID] = crypto.randomBytes(12).toString('base64');
-       }
-       
-     }
-     callback(null, true);
+io.sockets.on('connection', function(socket){
+  var userData = socket.userData = {};
+
+  userData.sessinID = crypto.randomBytes(12).toString('base64');
+
+  console.log('connect');
+  socket.on('enter room', function(url){
+    
+    var room = url.split('/').pop();
+    room = room || '';
+    userData.room = room
+    socket.join(room);
+    //socket.to(room).emit('message', {message:'enter room:'+ room});
+
+    socket.to(room).emit('counter',io.sockets.clients(room).length);
+
+    client.zrange(room, -50,-1, function(err, list){
+      socket.to(room).emit('message',list);
+    });
+  });
+
+  socket.on('send',function(data){
+    console.log(data);
+    if(data.user && data.text){
+      data.date = new Date();
+      data.sessionID = userData.sessinID;
+      client.zadd(userData.room, data.date.getTime() ,JSON.stringify(data));
+      socket.to(userData.room).emit('message',[JSON.stringify(data)]);
+      //socket.to(userData.room).emit('message',[JSON.stringify(data)]);
+    }
   });
 });
 
 
-//data delete
-app.get('/:id/del',function(req, res){
-  var id = '/' + req.params.id;
-  client.del(id);
-  res.redirect(contextRoot + id);
-});
 
 
-//room
-var rooms = {};
-app.get('/:id',function(req,res){
-  var id = '/'+ req.params.id;
-  if(id === '/favicon.ico'){
-    res.writeHead(404);
-    res.end();
-    return;
-  }
-  
-  if(!rooms[id]){
-    console.log('new room create %s',id);
-    var room = rooms[id] = {};
-    room.id = id;
-    room.sockets = io.of(id);
-    console.log(id);
-    room.counter = 0;
 
-    room.sockets.on('connection',function(socket){
-      room.counter++;
-      room.sockets.emit('counter',room.counter);
-        
-      client.zrange(room.id, -50,-1, function(err, list){
-        socket.emit('msg',list);
-      });
-
-      socket.on('send',function(data){
-        if(data.user && data.text){
-          data.date = new Date();
-          data.sessionID = socket.handshake.sessionID;
-          client.zadd(room.id, data.date.getTime() ,JSON.stringify(data));
-          room.sockets.emit('msg',[JSON.stringify(data)]);
-        }
-      });
-      
-      socket.on('disconnect',function(){
-        room.counter--;
-        delete ids[socket.handshake.sessionID];
-        if(room.counter <= 0){
-          console.log('counter zero: %s',room.id);
-          room.sockets.removeAllListeners();
-          delete rooms[room.id];
-        } else {
-          room.sockets.emit('counter',room.counter);
-        }
-      });
-    });
-    res.redirect(contextRoot + id);
-  } else {
-    res.render('index', { 
-      id:id,
-      layout:false,
-      contextRoot:contextRoot,
-      scontextRoot:scontextRoot 
-    });
-  }
-});

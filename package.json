@@ -1,0 +1,22 @@
+{
+  "name": "dynamic",
+  "version": "0.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": ":",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nns/dynamic.git"
+  },
+  "dependencies":{
+    "express":"3",
+    "socket.io": "0.9",
+    "connect-redis":"",
+    "socket.io-sessions":"",
+    "connect":"",
+    "jade":""
+  }
+}
+
