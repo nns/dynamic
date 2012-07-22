@@ -16,7 +16,8 @@
     "connect-redis":"",
     "socket.io-sessions":"",
     "connect":"",
-    "jade":""
+    "jade":"",
+    "redis":""
   }
 }
 

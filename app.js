@@ -34,7 +34,14 @@ app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
 
-app.get('/:room?', routes.index);
+app.get('/:room', routes.index);
+
+app.get('/:room/del',function(req, res){
+  var room = req.params.room || '/';
+  console.log(room);
+  client.del(room);
+  res.redirect(room);
+});
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
@@ -69,7 +76,7 @@ io.sockets.on('connection', function(socket){
   socket.on('enter room', function(url){
     
     var room = url.split('/').pop();
-    room = room || '';
+    room = room || '/';
     userData.room = room
     socket.join(room);
     //socket.to(room).emit('message', {message:'enter room:'+ room});
@@ -86,6 +93,7 @@ io.sockets.on('connection', function(socket){
     if(data.user && data.text){
       data.date = new Date();
       data.sessionID = userData.sessinID;
+      console.log(userData.room);
       client.zadd(userData.room, data.date.getTime() ,JSON.stringify(data));
       socket.to(userData.room).emit('message',[JSON.stringify(data)]);
       //socket.to(userData.room).emit('message',[JSON.stringify(data)]);
