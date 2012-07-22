@@ -74,11 +74,10 @@ textarea {
 #content li {
     display: inline-block;
     position: relative;
-    width: 300px;
     background: #fff;
     margin: 5px;
-    padding: 20px 0;
-    border-radius: 300px;
+    padding: 5px;
+    border-radius: 10px;
     text-shadow: none;
     -webkit-transition: all .2s ease-in-out;
 }
