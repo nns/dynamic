@@ -24,6 +24,7 @@ block content
         console.log('message');
         data.forEach(function(message){
           message = JSON.parse(message);
+          message.date =new Date(message.date).toLocaleString()
           var index = Math.floor(Math.random() * (animeIn.length - 1));
           var list = $('#template').tmpl(message);
           if(data.length === 1){
