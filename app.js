@@ -34,13 +34,13 @@ app.configure('production', function(){
   app.use(express.errorHandler()); 
 });
 
-app.get('/:room', routes.index);
+app.get('/dchat/:room', routes.index);
 
-app.get('/:room/del',function(req, res){
+app.get('/dchat/:room/del',function(req, res){
   var room = req.params.room || '/';
   console.log(room);
   client.del(room);
-  res.redirect(room);
+  res.redirect('dchat' + '/' + room);
 });
 
 var server = http.createServer(app).listen(app.get('port'), function(){
