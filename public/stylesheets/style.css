@@ -101,3 +101,13 @@ article a,
 ol { text-align: left }
 p,
 ol { margin: 5px 0 }
+
+
+#counter{
+    text-align: center;
+    color:#fff;
+    font-size:3em;
+    position: absolute;
+    top :1%;
+    left: 1%;
+}

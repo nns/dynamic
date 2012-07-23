@@ -84,11 +84,17 @@ io.sockets.on('connection', function(socket){
     socket.join(room);
     //socket.to(room).emit('message', {message:'enter room:'+ room});
 
-    socket.to(room).emit('counter',io.sockets.clients(room).length);
+    io.sockets.to(room).emit('counter',io.sockets.clients(room).length);
 
     client.zrange(room, -50,-1, function(err, list){
       socket.to(room).emit('message',list);
     });
+  });
+
+  socket.on('disconnect', function(){
+    console.log('disconnect');
+    console.log(io.sockets.clients(userData.room).length);
+    io.sockets.to(userData.room).emit('counter',io.sockets.clients(userData.room).length - 1);    
   });
 
   socket.on('send',function(data){
