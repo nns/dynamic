@@ -70,6 +70,15 @@ textarea {
     background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#d6d6d6), color-stop(100%, #c5c5c5));
     background-image: -webkit-linear-gradient(top, #d6d6d6, #c5c5c5);
 }
+#content ul{
+    width: 100%
+  -webkit-column-gap:10px;
+}
+@media screen and (max-width: 480px) {
+  div#content ul{
+    -webkit-column-count:1;
+  }
+}
 #content li {
     display: inline-block;
     position: relative;
@@ -80,15 +89,13 @@ textarea {
     text-shadow: none;
     -webkit-transition: all .2s ease-in-out;
 }
-#content li a:first-child { color: #000 }
+
 #content li:nth-child(2n+1) { background: #00B4FF }
-#content li:hover>a { font-size: .8em }
 #content li:hover {
     background: #88B4FF;
     box-shadow: 7px 5px 10px #22B4FF;
     left: -7px;
     top: -5px;
-    -webkit-transform: rotate(-20deg);
 }
 article a,
 ol { text-align: left }

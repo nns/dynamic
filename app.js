@@ -53,11 +53,12 @@ var io = sio.listen(server);
 
 
 io.configure('production', function(){
+  console.log('production');
   io.enable('browser client etag');
   io.enable('browser client gzip');
   io.enable('browser client minification');
   io.set('log level', 1);
-  io.set('close timeout',10);
+  //io.set('close timeout',10);
   io.set('polling duaration',10);
 });
 io.configure(function(){
