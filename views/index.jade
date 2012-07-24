@@ -9,11 +9,16 @@ block content
     $(function(){
       var animeIn = ['flipInX','flipInY','fadeInUp','fadeInDown','fadeInLeft','fadeInRight','fadeInUpBig','fadeInDownBig','fadeInLeftBig','fadeInRightBig','bounceInDown','bounceInUp','bounceInLeft','bounceInRight','rotateIn','rotateInDownLeft','rotateInDownRight','rotateInUpLeft','rotateInUpRight','lightSpeedIn','rollIn'];
 
-      var socket = io.connect(null, {url:location.href});
+
+      var socket = io.connect();
       socket.on('connect', function(){
         console.log('connect');
         $('#button').fadeIn();
-        socket.emit('enter room',location.href);
+        if(!localStorage.ssid){
+          localStorage.ssid = Math.floor(Math.random()*10000);
+        }
+        socket.emit('enter room',{url:location.href,ssid:localStorage.ssid});
+
         $('#msg').html('');  
       });
 

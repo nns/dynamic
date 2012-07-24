@@ -69,18 +69,20 @@ io.configure(function(){
 });
 
 
-io.sockets.on('connection', function(socket){
+io.sockets.on('connection', function(socket, options){
   var userData = socket.userData = {};
 
-  userData.sessinID = crypto.randomBytes(12).toString('base64');
-
   console.log('connect');
-  socket.on('enter room', function(url){
-    url = decodeURI(url);
+  socket.on('enter room', function(data){
+    url = decodeURI(data.url);
     var room = url.split('/').pop();
-    console.log(room);
     room = room || '/';
     userData.room = room
+
+    var sha1 = crypto.createHash('sha1');
+    sha1.update(data.ssid);
+    userData.sessionID = sha1.digest('base64').replace('=','')
+    console.log('1' + socket.userData.sessionID);
     socket.join(room);
     //socket.to(room).emit('message', {message:'enter room:'+ room});
 
@@ -100,7 +102,8 @@ io.sockets.on('connection', function(socket){
   socket.on('send',function(data){
     if(data.user && data.text){
       data.date = new Date();
-      data.sessionID = userData.sessinID;
+      data.sessionID = userData.sessionID;
+      console.log('2' + data.sessionID);
       client.zadd(userData.room, data.date.getTime() ,JSON.stringify(data));
       io.sockets.to(userData.room).emit('message',[JSON.stringify(data)]);
       //socket.to(userData.room).emit('message',[JSON.stringify(data)]);
