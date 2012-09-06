@@ -17,7 +17,8 @@
     "socket.io-sessions":"",
     "connect":"",
     "jade":"",
-    "redis":""
+    "redis":"",
+    "less-middleware":""
   }
 }
 

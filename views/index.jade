@@ -3,17 +3,13 @@ extends layout
 block content
   script
     $(function(){
-      
-
-    });
-    $(function(){
-      var animeIn = ['flipInX','flipInY','fadeInUp','fadeInDown','fadeInLeft','fadeInRight','fadeInUpBig','fadeInDownBig','fadeInLeftBig','fadeInRightBig','bounceInDown','bounceInUp','bounceInLeft','bounceInRight','rotateIn','rotateInDownLeft','rotateInDownRight','rotateInUpLeft','rotateInUpRight','lightSpeedIn','rollIn'];
+      var animeIn = ['flipInX','flipInY','fadeInUp','fadeInDown','fadeInLeft','fadeInRight'];
 
 
       var socket = io.connect();
       socket.on('connect', function(){
         console.log('connect');
-        $('#button').fadeIn();
+        $('#inputs').fadeIn();
         if(!localStorage.ssid){
           localStorage.ssid = Math.floor(Math.random()*10000);
         }
@@ -86,21 +82,38 @@ block content
           });
         }
       });
-
     });
-  #inputs
-    input#user(type="text",placeholder="name")
-    br
-    textarea#text(placeholder="message")
-    button#button.button(style="display:none") send
-  #counter
-  #content
+  style
+    #inputs:hover { top: 3px }
+    #inputs {
+        -webkit-box-shadow: 3px 3px 5px 0px #777;
+        position: absolute;
+        top: -250px;
+        left: 60%;
+        z-index: 9999;
+        -webkit-transition-property: top;
+        -webkit-transition-duration: .3s;
+        -webkit-transition-timing-function: ease-in;
+        -moz-transition-property: top;
+        -moz-transition-duration: .3s;
+        -moz-transition-timing-function: ease-in;
+    }
+  #inputs.well.span4(style="position:absolute;")
+    fieldset
+      .control-group
+        label.control-label nickname
+        input#user.input-small(type="text")
+      .control-group
+        textarea#text(style="width:100%;height:6em;",placeholder="comment")
+      .form-actions(style="margin:0;padding:20px;")
+        button#button.btn.btn-primary send
+    h6#counter
+  #content.well
     ul#msg
   script#template(type="text/x-jquery-tmpl")
       |<li>
-      | <h2>${user}</h2>
-      | <span class='id'>${sessionID}</span>
-      | <p>${date}</p>
-      | <div class='message'>
-      |   <pre>${text}</pre>
+      | <h4 style="display:inline">${user}</h4>
+      | <strong>id:</strong>${sessionID}
+      | <p class=''>${date}</p>
+      | <pre>${text}</pre>
       |</li>
