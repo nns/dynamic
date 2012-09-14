@@ -32,8 +32,8 @@ block content
           if(data.length === 1){
             $(list[0]).addClass('animated ' + animeIn[index]);
             var bridge = document.getElementById("GrowlBridge");
-            var growl = bridge.Growl("");
-            if(growl){
+            if(bridge.Growl){
+              var growl = bridge.Growl("");
               growl.register("dchat", "http://www.growlforwindows.com/gfw/examples/js/growl.png");
               growl.notify(message.user, message.text, "http://www.growlforwindows.com/gfw/examples/js/growl.png");
             } else {
