@@ -31,17 +31,24 @@ block content
           var list = $('#template').tmpl(message);
           if(data.length === 1){
             $(list[0]).addClass('animated ' + animeIn[index]);
-            try{
-              var notice = Notification.create('','from-'+message.user,message.text);
-              notice.ondisplay = function(){
-                setTimeout(function(){
-                  notice.cancel();
-                },5000);
-              };
-              notice.onclose = function(){
-              };
-              notice.show();
-            }catch(e){}
+            var bridge = document.getElementById("GrowlBridge");
+            var growl = bridge.Growl("");
+            if(growl){
+              growl.register("dchat", "http://www.growlforwindows.com/gfw/examples/js/growl.png");
+              growl.notify(message.user, message.text, "http://www.growlforwindows.com/gfw/examples/js/growl.png");
+            } else {
+              try{
+                var notice = Notification.create('','from-'+message.user,message.text);
+                notice.ondisplay = function(){
+                  setTimeout(function(){
+                    notice.cancel();
+                  },5000);
+                };
+                notice.onclose = function(){
+                };
+                notice.show();
+              }catch(e){}
+            }
           }
           list.prependTo('#msg');
         });
@@ -98,6 +105,7 @@ block content
         -moz-transition-duration: .3s;
         -moz-transition-timing-function: ease-in;
     }
+  object(type="application/gntp-plugin",id="GrowlBridge",width="0",height="0",style="height:0px;width:0px;position:absolute;")
   #inputs.well.span4(style="position:absolute;")
     fieldset
       .control-group
